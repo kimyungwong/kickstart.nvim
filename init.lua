@@ -583,6 +583,8 @@ do
       -- To jump back, press <C-t>.
       vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
 
+      vim.keymap.set('n', 'gd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+
       -- Fuzzy find all the symbols in your current document.
       -- Symbols are things like variables, functions, types, etc.
       vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { buffer = buf, desc = 'Open Document Symbols' })
@@ -734,7 +736,7 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     -- clangd = {},
-    -- gopls = {},
+    gopls = {},
     -- pyright = {},
     -- tsc = {},
     --
@@ -801,7 +803,8 @@ do
   --    :Mason
   --
   -- You can press `g?` for help in this menu.
-  local ensure_installed = vim.tbl_keys(servers or {})
+  --local ensure_installed = vim.tbl_keys(servers or {})
+  local ensure_installed = vim.tbl_filter(function(name) return name ~= 'gopls' end, vim.tbl_keys(servers or {}))
   vim.list_extend(ensure_installed, {
     -- You can add other tools here that you want Mason to install
   })
@@ -826,6 +829,7 @@ do
     format_on_save = function(bufnr)
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
+        go = true,
         -- lua = true,
         -- python = true,
       }
@@ -948,7 +952,7 @@ do
   vim.pack.add { { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' } }
 
   -- Ensure basic parsers are installed
-  local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+  local parsers = { 'bash', 'c', 'diff', 'go', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
   require('nvim-treesitter').install(parsers)
 
   ---@param buf integer
@@ -1018,7 +1022,7 @@ do
   -- require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.neo-tree'
+  require 'kickstart.plugins.neo-tree'
 
   -- NOTE: You can add your own plugins, configuration, etc. in `lua/custom/plugins/*.lua`.
   --
