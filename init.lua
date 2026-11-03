@@ -418,6 +418,7 @@ do
     icons = { mappings = vim.g.have_nerd_font },
     -- Document existing key chains
     spec = {
+      { '<leader>g', group = '[G]it' },
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
@@ -1037,6 +1038,12 @@ do
   vim.pack.add { 'https://github.com/nvim-treesitter/nvim-treesitter-context' }
   require('treesitter-context').setup { max_lines = 3 }
   vim.keymap.set('n', '[C', function() require('treesitter-context').go_to_context() end, { desc = 'Go to context' })
+
+  -- vim-fugitive and it's keymap
+  vim.pack.add { 'https://github.com/tpope/vim-fugitive' }
+  vim.keymap.set('n', '<leader>gs', '<Cmd>Git<CR>', { desc = '[G]it [S]tatus' })
+  vim.keymap.set('n', '<leader>gd', '<Cmd>Gvdiffsplit<CR>', { desc = 'Git diff file' })
+  vim.keymap.set('n', '<leader>gb', '<Cmd>Git blame<CR>', { desc = 'Git blame' })
 
   -- NOTE: You can add your own plugins, configuration, etc. in `lua/custom/plugins/*.lua`.
   --
