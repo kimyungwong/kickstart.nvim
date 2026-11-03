@@ -852,6 +852,7 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
+      go = { 'goimports' },
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
@@ -1031,6 +1032,11 @@ do
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
   require 'kickstart.plugins.neo-tree'
+
+  -- Sticky function signature (like VS Code sticky scroll)
+  vim.pack.add { 'https://github.com/nvim-treesitter/nvim-treesitter-context' }
+  require('treesitter-context').setup { max_lines = 3 }
+  vim.keymap.set('n', '[C', function() require('treesitter-context').go_to_context() end, { desc = 'Go to context' })
 
   -- NOTE: You can add your own plugins, configuration, etc. in `lua/custom/plugins/*.lua`.
   --
