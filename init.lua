@@ -836,6 +836,24 @@ do
     vim.lsp.config(name, server)
     vim.lsp.enable(name)
   end
+  vim.lsp.enable('intelephense')
+
+  local vue_ls_path = vim.fn.trim(vim.fn.system("find \"$(mise where npm:@vue/language-server)\" -type d -path '*node_modules/@vue/language-server' | head -1"))
+
+  vim.lsp.config('vtsls', {
+    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
+    settings = {
+      vtsls = {
+        tsserver = {
+          globalPlugins = {
+            { name = '@vue/typescript-plugin', location = vue_ls_path,
+              languages = { 'vue' }, configNamespace = 'typescript' },
+          },
+        },
+      },
+    },
+  })
+  vim.lsp.enable({ 'vtsls', 'vue_ls' })
 end
 
 -- ============================================================
