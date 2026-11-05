@@ -751,6 +751,8 @@ do
     end,
   })
 
+  local vue_ls_path = vim.fn.stdpath('data') .. '/mason/packages/vue-language-server/node_modules/@vue/language-server'
+
   -- Enable the following language servers
   --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
   --  See `:help lsp-config` for information about keys and how to configure
@@ -758,6 +760,20 @@ do
   local servers = {
     -- clangd = {},
     gopls = {},
+    vtsls = {
+      filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
+      settings = {
+        vtsls = {
+          tsserver = {
+            globalPlugins = {
+              { name = '@vue/typescript-plugin', location = vue_ls_path,
+                languages = { 'vue' }, configNamespace = 'typescript' },
+            },
+          },
+        },
+      },
+    },
+    vue_ls = {},
     -- pyright = {},
     -- tsc = {},
     --
@@ -838,22 +854,22 @@ do
   end
   vim.lsp.enable('intelephense')
 
-  local vue_ls_path = vim.fn.trim(vim.fn.system("find \"$(mise where npm:@vue/language-server)\" -type d -path '*node_modules/@vue/language-server' | head -1"))
-
-  vim.lsp.config('vtsls', {
-    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
-    settings = {
-      vtsls = {
-        tsserver = {
-          globalPlugins = {
-            { name = '@vue/typescript-plugin', location = vue_ls_path,
-              languages = { 'vue' }, configNamespace = 'typescript' },
-          },
-        },
-      },
-    },
-  })
-  vim.lsp.enable({ 'vtsls', 'vue_ls' })
+-- OMP use different version of vue lsp server, so use Mason install that for neovim
+--  local vue_ls_path = vim.fn.trim(vim.fn.system("find \"$(mise where npm:@vue/language-server)\" -type d -path '*node_modules/@vue/language-server' | head -1"))
+--  vim.lsp.config('vtsls', {
+--    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
+--    settings = {
+--      vtsls = {
+--        tsserver = {
+--          globalPlugins = {
+--            { name = '@vue/typescript-plugin', location = vue_ls_path,
+--              languages = { 'vue' }, configNamespace = 'typescript' },
+--          },
+--        },
+--      },
+--    },
+--  })
+--  vim.lsp.enable({ 'vtsls', 'vue_ls' })
 end
 
 -- ============================================================
