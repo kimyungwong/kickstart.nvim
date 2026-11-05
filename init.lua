@@ -877,6 +877,21 @@ end
 -- conform.nvim setup and keymap
 -- ============================================================
 do
+  vim.api.nvim_create_autocmd('BufWritePre', {
+    pattern = '*.go',
+    desc = 'gopls: organize imports on save',
+    callback = function(args)
+      local client = vim.lsp.get_clients({ bufnr = args.buf, name = 'gopls' })[1]
+      if not client then return end
+      local params = vim.lsp.util.make_range_params(0, client.offset_encoding) --[[@as lsp.CodeActionParams]]
+      params.context = { only = { 'source.organizeImports' }, diagnostics = {} }
+      local res = client:request_sync('textDocument/codeAction', params, 1000, args.buf)
+      for _, action in ipairs((res and res.result) or {}) do
+        if action.edit then vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding) end
+      end
+    end,
+  })
+
   -- [[ Formatting ]]
   vim.pack.add { gh 'stevearc/conform.nvim' }
   require('conform').setup {
@@ -899,7 +914,7 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
-      go = { 'goimports' },
+      -- go = { 'goimports' },
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
