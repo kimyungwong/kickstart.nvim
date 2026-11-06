@@ -494,6 +494,21 @@ do
   -- - sr)'  - [S]urround [R]eplace [)] [']
   require('mini.surround').setup()
 
+  -- Smooth scrolling
+  vim.o.mousescroll = 'ver:1,hor:1'
+  if not vim.g.neovide then
+    local animate = require('mini.animate')
+    local fast = animate.gen_timing.linear({ duration = 80, unit = 'total' })
+
+    animate.setup({
+      cursor = { enable = false, timing = fast, },
+      scroll = { enable = true, timing = fast, },
+      resize = { enable = true, timing = fast, },
+      open   = { enable = true, timing = fast, },
+      close  = { enable = true, timing = fast, },
+    })
+  end
+
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
   --  and try some other statusline plugin
