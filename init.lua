@@ -118,17 +118,31 @@ do
   -- Don't show the mode, since it's already in the status line
   vim.o.showmode = false
 
-  vim.g.clipboard = {
-     name = "OSC 52",
-     copy = {
-       ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-       ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-     },
-     paste = {
-       ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-       ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
-     },
-  }
+  --vim.g.clipboard = {
+  --   name = "OSC 52",
+  --   copy = {
+  --     ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+  --     ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+  --   },
+  --   paste = {
+  --     ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+  --     ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+  --   },
+  --}
+  -- Above solution would make neovim compliant when paste
+  if vim.env.SSH_TTY then
+    local function paste()
+      return { vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('') }
+    end
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = {
+        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+      },
+      paste = { ['+'] = paste, ['*'] = paste },
+    }
+  end
 
   -- Sync clipboard between OS and Neovim.
   --  Schedule the setting after `UiEnter` because it can increase startup-time.
@@ -1134,6 +1148,13 @@ do
   -- require 'custom.plugins.colorscheme'
   -- require 'custom.plugins.ui'
   -- require 'custom.plugins.git'
+
+  -- :UpdateAll to update everything
+  vim.api.nvim_create_user_command('UpdateAll', function()
+    vim.pack.update(nil, { force = true }) -- update all plugins, skip the confirm buffer
+    vim.cmd 'MasonToolsUpdate'
+    vim.cmd 'TSUpdate'
+  end, { desc = 'Update plugins, Mason tools and treesitter parsers' })
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
