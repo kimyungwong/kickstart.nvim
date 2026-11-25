@@ -118,37 +118,27 @@ do
   -- Don't show the mode, since it's already in the status line
   vim.o.showmode = false
 
-  --vim.g.clipboard = {
-  --   name = "OSC 52",
-  --   copy = {
-  --     ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-  --     ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-  --   },
-  --   paste = {
-  --     ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-  --     ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
-  --   },
-  --}
-  -- Above solution would make neovim compliant when paste
-  if vim.env.SSH_TTY then
-    local function paste()
-      return { vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('') }
-    end
-    vim.g.clipboard = {
-      name = 'OSC 52',
-      copy = {
-        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-      },
-      paste = { ['+'] = paste, ['*'] = paste },
-    }
-  end
-
   -- Sync clipboard between OS and Neovim.
   --  Schedule the setting after `UiEnter` because it can increase startup-time.
   --  Remove this option if you want your OS clipboard to remain independent.
   --  See `:help 'clipboard'`
   vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
+
+  -- OSC 52 copy over SSH or remote Rex; paste from Neovim's own register (avoids OSC 52 paste hang)
+  local in_rex = vim.env.REX_BLOCK ~= nil and vim.env.REX_BLOCK ~= ''
+  local is_mac = vim.fn.has('mac') == 1
+
+  if vim.env.SSH_TTY or (in_rex and not is_mac) then
+    local osc52 = require('vim.ui.clipboard.osc52')
+    local function paste()
+      return { vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('') }
+    end
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = { ['+'] = osc52.copy('+'), ['*'] = osc52.copy('*') },
+      paste = { ['+'] = paste, ['*'] = paste },
+    }
+  end
 
   -- Enable break indent
   vim.o.breakindent = true
